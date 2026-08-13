@@ -1,0 +1,16 @@
+{
+  "category": "interview",
+  "metrics": {
+    "question_count": 2,
+    "repeated_questions": true,
+    "interview_type": "technical",
+    "role": "",
+    "difficulty_range": {
+      "min": 2,
+      "max": 2
+    },
+    "topic_coverage": 1
+  },
+  "timestamp": "2026-08-12T08:37:13.931079+00:00",
+  "trace_id": null
+}

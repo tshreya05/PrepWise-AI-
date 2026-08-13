@@ -10,7 +10,8 @@ settings = get_settings()
 
 Path("./data").mkdir(parents=True, exist_ok=True)
 Path(settings.upload_dir).mkdir(parents=True, exist_ok=True)
-Path(settings.vector_store_dir).mkdir(parents=True, exist_ok=True)
+Path(settings.chroma_persist_dir).mkdir(parents=True, exist_ok=True)
+Path(settings.evaluation_log_dir).mkdir(parents=True, exist_ok=True)
 
 engine = create_engine(
     settings.database_url,

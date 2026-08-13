@@ -1,0 +1,13 @@
+{
+  "category": "quiz",
+  "metrics": {
+    "question_count": 1,
+    "valid_structure": true,
+    "topic_match": "Algorithms",
+    "difficulty": "easy",
+    "has_explanations": true,
+    "has_knowledge_source": true
+  },
+  "timestamp": "2026-08-12T08:34:03.854562+00:00",
+  "trace_id": null
+}

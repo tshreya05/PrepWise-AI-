@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from api.deps import get_current_user
 from database.db import get_db
-from database.models import User
+from models.user import User
 from schemas.resume import ResumeResponse, ResumeAnalysisResponse
 from services.app_services import ResumeService
 

@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 
 from api.deps import get_current_user
 from database.db import get_db
-from database.models import User, Interview
+from models.user import User
+from database.models import Interview
 from schemas.interview import InterviewHistoryItem
 
 router = APIRouter(tags=["history"])

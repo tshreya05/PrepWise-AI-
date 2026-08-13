@@ -1,0 +1,9 @@
+[
+  {
+    "id": 1,
+    "email": "abz@gmail.com",
+    "full_name": "Shreya Tiwari ",
+    "hashed_password": "$2b$12$AXG6uizFqdfZTqkFBN5HbuH4oTi0NFkVlbeESg4d1ebz7kDVOWo7i",
+    "created_at": "2026-08-13T06:33:07.933274+00:00"
+  }
+]

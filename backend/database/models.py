@@ -1,9 +1,6 @@
 from datetime import datetime, timezone
-from typing import Optional
 
-from sqlalchemy import (
-    Column, Integer, String, Text, Float, DateTime, ForeignKey, JSON, Boolean
-)
+from sqlalchemy import Column, Integer, String, Text, Float, DateTime, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 
 from database.db import Base
@@ -13,26 +10,11 @@ def utcnow():
     return datetime.now(timezone.utc)
 
 
-class User(Base):
-    __tablename__ = "users"
-
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String(255), unique=True, index=True, nullable=False)
-    full_name = Column(String(255), nullable=False)
-    hashed_password = Column(String(255), nullable=False)
-    created_at = Column(DateTime, default=utcnow)
-
-    resumes = relationship("Resume", back_populates="user", cascade="all, delete-orphan")
-    job_descriptions = relationship("JobDescription", back_populates="user", cascade="all, delete-orphan")
-    interviews = relationship("Interview", back_populates="user", cascade="all, delete-orphan")
-    learning_cards = relationship("LearningCard", back_populates="user", cascade="all, delete-orphan")
-
-
 class Resume(Base):
     __tablename__ = "resumes"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, nullable=False, index=True)
     filename = Column(String(255), nullable=False)
     file_path = Column(String(500), nullable=False)
     raw_text = Column(Text, nullable=False)
@@ -43,27 +25,23 @@ class Resume(Base):
     analysis = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=utcnow)
 
-    user = relationship("User", back_populates="resumes")
-
 
 class JobDescription(Base):
     __tablename__ = "job_descriptions"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, nullable=False, index=True)
     filename = Column(String(255), nullable=True)
     file_path = Column(String(500), nullable=True)
     raw_text = Column(Text, nullable=False)
     created_at = Column(DateTime, default=utcnow)
-
-    user = relationship("User", back_populates="job_descriptions")
 
 
 class Interview(Base):
     __tablename__ = "interviews"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, nullable=False, index=True)
     interview_type = Column(String(50), nullable=False)
     status = Column(String(50), default="in_progress")
     difficulty_level = Column(Integer, default=1)
@@ -79,7 +57,6 @@ class Interview(Base):
     created_at = Column(DateTime, default=utcnow)
     completed_at = Column(DateTime, nullable=True)
 
-    user = relationship("User", back_populates="interviews")
     questions = relationship("InterviewQuestion", back_populates="interview", cascade="all, delete-orphan")
 
 
@@ -108,7 +85,7 @@ class LearningCard(Base):
     __tablename__ = "learning_cards"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, nullable=False, index=True)
     topic = Column(String(255), nullable=False)
     reason = Column(Text, nullable=False)
     estimated_time = Column(String(50), nullable=False)
@@ -116,14 +93,12 @@ class LearningCard(Base):
     quiz = Column(JSON, default=list)
     created_at = Column(DateTime, default=utcnow)
 
-    user = relationship("User", back_populates="learning_cards")
-
 
 class PracticeQuiz(Base):
     __tablename__ = "practice_quizzes"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, nullable=False, index=True)
     topic = Column(String(255), nullable=False)
     difficulty = Column(String(20), nullable=False)
     questions = Column(JSON, nullable=False)

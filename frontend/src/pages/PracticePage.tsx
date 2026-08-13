@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, CheckCircle, XCircle, Loader2 } from 'lucide-react'
+import { Brain, CheckCircle2, XCircle, Loader2, Trophy, RotateCcw } from 'lucide-react'
 import AppLayout from '@/components/layout/AppLayout'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import Badge from '@/components/ui/Badge'
 import { practiceApi } from '@/services/api'
 
 interface QuizQuestion {
@@ -65,27 +66,38 @@ export default function PracticePage() {
 
   return (
     <AppLayout>
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold mb-2">Practice</h1>
-        <p className="text-muted mb-8">Test your knowledge with AI-generated MCQs</p>
+      <div className="max-w-3xl mx-auto space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Brain className="w-6 h-6 text-emerald-500" />
+            AI MCQ Quiz Practice
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Generate customized technical MCQs to reinforce weak areas.
+          </p>
+        </div>
 
-        <Card className="mb-6">
+        {/* Generator Controls Card */}
+        <Card className="space-y-4">
           <div className="grid md:grid-cols-3 gap-4">
             <Input
-              label="Topic"
-              placeholder="e.g. System Design, React, SQL"
+              label="Topic Name"
+              placeholder="e.g. System Design, React 18, SQL Indexes"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
             />
             <div className="space-y-2">
-              <label className="text-sm text-muted font-medium">Difficulty</label>
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Difficulty</label>
               <div className="flex gap-2">
                 {['easy', 'medium', 'hard'].map((d) => (
                   <button
                     key={d}
                     onClick={() => setDifficulty(d)}
-                    className={`flex-1 py-2 rounded-xl text-sm capitalize transition-all ${
-                      difficulty === d ? 'bg-primary text-white' : 'bg-white/5 text-muted hover:bg-white/10'
+                    className={`flex-1 py-2 rounded-xl text-xs font-semibold capitalize transition-all ${
+                      difficulty === d
+                        ? 'bg-indigo-600 text-white shadow-sm'
+                        : 'glass text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     {d}
@@ -94,40 +106,55 @@ export default function PracticePage() {
               </div>
             </div>
             <div className="flex items-end">
-              <Button className="w-full" onClick={generateQuiz} disabled={loading || !topic.trim()}>
+              <Button className="w-full justify-center" onClick={generateQuiz} disabled={loading || !topic.trim()}>
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Generate Quiz'}
               </Button>
             </div>
           </div>
         </Card>
 
+        {/* Quiz Runner */}
         <AnimatePresence mode="wait">
           {finished ? (
-            <motion.div key="finished" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <Card className="text-center py-12">
-                <Brain className="w-16 h-16 text-primary mx-auto mb-4" />
-                <h2 className="text-2xl font-bold mb-2">Quiz Complete!</h2>
-                <p className="text-3xl font-bold text-primary mb-4">
-                  {score}/{questions.length}
+            <motion.div key="finished" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+              <Card className="text-center py-10 space-y-4">
+                <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center mx-auto">
+                  <Trophy className="w-8 h-8" />
+                </div>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Quiz Completed!</h2>
+                <p className="text-4xl font-extrabold text-indigo-600 dark:text-indigo-400">
+                  {score} / {questions.length}
                 </p>
-                <p className="text-muted mb-6">
-                  {score === questions.length ? 'Perfect score!' :
-                   score >= questions.length * 0.7 ? 'Great job!' : 'Keep practicing!'}
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {score === questions.length ? 'Outstanding score! You mastered this topic.' : 'Good effort! Review explanations to reinforce knowledge.'}
                 </p>
-                <Button onClick={generateQuiz}>Try Again</Button>
+                <Button onClick={generateQuiz} className="mx-auto">
+                  <RotateCcw className="w-4 h-4 mr-1.5" /> Try Another Quiz
+                </Button>
               </Card>
             </motion.div>
           ) : questions.length > 0 ? (
             <motion.div key={`q-${currentQ}`} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <Card>
-                <div className="flex items-center justify-between mb-6">
-                  <span className="text-sm text-muted">Question {currentQ + 1} of {questions.length}</span>
-                  <span className="text-sm text-accent capitalize">{difficulty}</span>
+              <Card className="space-y-6">
+                {/* Quiz Header & Progress Bar */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-semibold text-slate-400">Question {currentQ + 1} of {questions.length}</span>
+                    <Badge variant="accent" size="sm" className="capitalize">{difficulty}</Badge>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
+                    <div
+                      className="h-full bg-indigo-500 transition-all duration-300"
+                      style={{ width: `${((currentQ + 1) / questions.length) * 100}%` }}
+                    />
+                  </div>
                 </div>
 
-                <h3 className="text-lg font-medium mb-6">{questions[currentQ].question}</h3>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white leading-relaxed">
+                  {questions[currentQ].question}
+                </h3>
 
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {questions[currentQ].options.map((opt, i) => {
                     const isCorrect = i === questions[currentQ].correct_index
                     const isSelected = i === selected
@@ -136,20 +163,20 @@ export default function PracticePage() {
                         key={i}
                         onClick={() => handleAnswer(i)}
                         disabled={showResult}
-                        className={`w-full text-left p-4 rounded-xl border transition-all ${
+                        className={`w-full text-left p-4 rounded-xl border text-xs transition-all ${
                           showResult
                             ? isCorrect
-                              ? 'border-green-500/50 bg-green-500/10'
+                              ? 'border-emerald-500 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-semibold'
                               : isSelected
-                              ? 'border-red-500/50 bg-red-500/10'
-                              : 'border-white/10 opacity-50'
-                            : 'border-white/10 hover:border-primary/50 hover:bg-white/5'
+                              ? 'border-rose-500 bg-rose-500/15 text-rose-700 dark:text-rose-300 font-semibold'
+                              : 'border-slate-200/50 dark:border-white/5 opacity-40'
+                            : 'border-slate-200/80 dark:border-white/10 glass hover:border-indigo-500/50 hover:bg-slate-100 dark:hover:bg-white/5'
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          {showResult && isCorrect && <CheckCircle className="w-5 h-5 text-green-400" />}
-                          {showResult && isSelected && !isCorrect && <XCircle className="w-5 h-5 text-red-400" />}
-                          <span className="text-sm">{opt}</span>
+                          {showResult && isCorrect && <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />}
+                          {showResult && isSelected && !isCorrect && <XCircle className="w-4 h-4 text-rose-500 flex-shrink-0" />}
+                          <span>{opt}</span>
                         </div>
                       </button>
                     )
@@ -157,12 +184,13 @@ export default function PracticePage() {
                 </div>
 
                 {showResult && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-6">
-                    <p className="text-sm text-muted mb-4 p-3 rounded-xl bg-white/5">
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 pt-2">
+                    <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-white/5 text-xs text-slate-600 dark:text-slate-300 leading-relaxed border border-slate-200/60 dark:border-white/10">
+                      <span className="font-bold text-indigo-500">Explanation: </span>
                       {questions[currentQ].explanation}
-                    </p>
-                    <Button onClick={nextQuestion} className="w-full">
-                      {currentQ < questions.length - 1 ? 'Next Question' : 'See Results'}
+                    </div>
+                    <Button onClick={nextQuestion} className="w-full justify-center">
+                      {currentQ < questions.length - 1 ? 'Next Question' : 'View Final Score'}
                     </Button>
                   </motion.div>
                 )}
@@ -170,8 +198,10 @@ export default function PracticePage() {
             </motion.div>
           ) : !loading ? (
             <Card className="text-center py-12">
-              <Brain className="w-12 h-12 text-muted mx-auto mb-4" />
-              <p className="text-muted">Enter a topic and generate a practice quiz</p>
+              <Brain className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+              <p className="text-slate-500 dark:text-slate-400 text-sm">
+                Enter a topic above (e.g. System Design) and click Generate Quiz to begin.
+              </p>
             </Card>
           ) : null}
         </AnimatePresence>

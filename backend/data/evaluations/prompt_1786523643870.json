@@ -1,0 +1,17 @@
+{
+  "category": "prompt",
+  "metrics": {
+    "missing_variables": [
+      "history",
+      "previous_questions",
+      "context",
+      "difficulty"
+    ],
+    "has_resume_context": false,
+    "has_jd_context": false,
+    "context_length": 0,
+    "valid": false
+  },
+  "timestamp": "2026-08-12T08:34:03.870832+00:00",
+  "trace_id": null
+}

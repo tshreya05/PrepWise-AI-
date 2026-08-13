@@ -1,17 +1,4 @@
-import logging
-import sys
+"""Backward-compatible logging entry point."""
+from utils.structured_logging import setup_logging, get_logger, LatencyTracker, trace_id_var
 
-from config import get_settings
-
-
-def setup_logging() -> None:
-    settings = get_settings()
-    logging.basicConfig(
-        level=getattr(logging, settings.log_level.upper(), logging.INFO),
-        format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-        handlers=[logging.StreamHandler(sys.stdout)],
-    )
-
-
-def get_logger(name: str) -> logging.Logger:
-    return logging.getLogger(name)
+__all__ = ["setup_logging", "get_logger", "LatencyTracker", "trace_id_var"]

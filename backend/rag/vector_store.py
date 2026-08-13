@@ -1,52 +1,29 @@
-from langchain_community.vectorstores import FAISS
-
-from config import get_settings
-from rag.embeddings import EmbeddingService
-from utils.logging_config import get_logger
-
-logger = get_logger(__name__)
+from abc import ABC, abstractmethod
+from typing import Any
 
 
-class VectorStoreManager:
-    def __init__(self):
-        settings = get_settings()
-        self.store_dir = settings.vector_store_dir
-        self.embedding_service = EmbeddingService()
+class VectorStore(ABC):
+    """Abstract vector store — ChromaDB today, swappable later."""
 
-    def _get_store_path(self, user_id: int) -> str:
-        return f"{self.store_dir}/user_{user_id}"
+    @abstractmethod
+    def upsert(self, collection: str, documents: list[dict[str, Any]]) -> int:
+        """Insert or replace documents. Returns chunk count."""
 
-    def build_index(self, user_id: int, documents: list[dict]) -> FAISS | None:
-        if not documents:
-            return None
-        settings = get_settings()
-        if not settings.openai_api_key:
-            logger.warning("No OpenAI API key - RAG index not built")
-            return None
+    @abstractmethod
+    def query(
+        self,
+        collection: str,
+        query_text: str,
+        k: int = 6,
+        where: dict[str, Any] | None = None,
+        score_threshold: float | None = None,
+    ) -> list[dict[str, Any]]:
+        """Return ranked chunks with content, metadata, score."""
 
-        texts = [d["content"] for d in documents]
-        metadatas = [d.get("metadata", {}) for d in documents]
-        vectorstore = FAISS.from_texts(
-            texts,
-            self.embedding_service.embeddings,
-            metadatas=metadatas,
-        )
-        path = self._get_store_path(user_id)
-        vectorstore.save_local(path)
-        logger.info("Built FAISS index for user %d with %d chunks", user_id, len(texts))
-        return vectorstore
+    @abstractmethod
+    def delete_collection(self, collection: str) -> None:
+        pass
 
-    def load_index(self, user_id: int) -> FAISS | None:
-        settings = get_settings()
-        if not settings.openai_api_key:
-            return None
-        path = self._get_store_path(user_id)
-        try:
-            return FAISS.load_local(
-                path,
-                self.embedding_service.embeddings,
-                allow_dangerous_deserialization=True,
-            )
-        except Exception:
-            logger.warning("No existing FAISS index for user %d", user_id)
-            return None
+    @abstractmethod
+    def collection_stats(self, collection: str) -> dict[str, Any]:
+        pass

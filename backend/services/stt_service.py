@@ -6,5 +6,9 @@ class STTService(ABC):
 
     @abstractmethod
     async def transcribe(self, audio_data: bytes, filename: str = "audio.webm") -> str:
-        """Convert audio bytes to text."""
+        pass
+
+    @property
+    @abstractmethod
+    def provider_name(self) -> str:
         pass

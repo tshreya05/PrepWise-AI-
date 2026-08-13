@@ -6,5 +6,9 @@ class TTSService(ABC):
 
     @abstractmethod
     async def synthesize(self, text: str) -> tuple[bytes, str]:
-        """Convert text to audio. Returns (audio_bytes, format)."""
+        pass
+
+    @property
+    @abstractmethod
+    def provider_name(self) -> str:
         pass
